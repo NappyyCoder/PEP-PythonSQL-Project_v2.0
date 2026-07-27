@@ -14,32 +14,13 @@ cursor = conn.cursor()
 
 
 def main():
-
-    # users table
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-                        userId INTEGER PRIMARY KEY,
-                        firstName TEXT,
-                        lastName TEXT
-                      )'''
-                   )
-
-    # callLogs table (with FK to users table)
-    cursor.execute('''CREATE TABLE IF NOT EXISTS callLogs (
-        callId INTEGER PRIMARY KEY,
-        phoneNumber TEXT,
-        startTime INTEGER,
-        endTime INTEGER,
-        direction TEXT,
-        userId INTEGER,
-        FOREIGN KEY (userId) REFERENCES users(userId)
-    )''')
-
     # IMPORTANT:
-    # Do NOT load CSVs here.
-    # The test runner calls your functions itself.
-
-    cursor.close()
-    conn.close()
+    # main() MUST NOT create tables
+    # main() MUST NOT load CSVs
+    # main() MUST NOT close the cursor or connection
+    #
+    # The Revature test runner handles ALL of that.
+    pass
 
 
 # ---------------------------------------------------------
@@ -52,8 +33,10 @@ def load_and_clean_users(file_path):
         next(reader, None)  # skip header
 
         for row in reader:
+            # Must have exactly 3 fields
             if len(row) != 3:
                 continue
+            # Must have no empty fields
             if any(field.strip() == "" for field in row):
                 continue
 
@@ -72,8 +55,10 @@ def load_and_clean_call_logs(file_path):
         next(reader, None)  # skip header
 
         for row in reader:
+            # Must have exactly 6 fields
             if len(row) != 6:
                 continue
+            # Must have no empty fields
             if any(field.strip() == "" for field in row):
                 continue
 
