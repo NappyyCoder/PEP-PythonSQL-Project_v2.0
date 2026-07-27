@@ -34,29 +34,27 @@ def main():
         FOREIGN KEY (userId) REFERENCES users(userId)
     )''')
 
-    # Implemented functions
     load_and_clean_users(os.path.join(_RESOURCES_DIR, 'users.csv'))
     load_and_clean_call_logs(os.path.join(_RESOURCES_DIR, 'callLogs.csv'))
     write_user_analytics(os.path.join(_RESOURCES_DIR, 'userAnalytics.csv'))
     write_ordered_calls(os.path.join(_RESOURCES_DIR, 'orderedCalls.csv'))
 
-    # Uncomment to debug:
-    # select_from_users_and_call_logs()
+    # select_from_users_and_call_logs()  # Uncomment to debug
 
     cursor.close()
     conn.close()
 
 
 # ---------------------------------------------------------
-# IMPLEMENTED FUNCTIONS BELOW
+# IMPLEMENTED FUNCTIONS
 # ---------------------------------------------------------
 
 def load_and_clean_users(file_path):
     with open(file_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
+        next(reader, None)  # skip header
 
         for row in reader:
-            # Expect exactly 3 fields
             if len(row) != 3:
                 continue
             if any(field.strip() == "" for field in row):
@@ -74,9 +72,9 @@ def load_and_clean_users(file_path):
 def load_and_clean_call_logs(file_path):
     with open(file_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
+        next(reader, None)  # skip header
 
         for row in reader:
-            # Expect exactly 6 fields
             if len(row) != 6:
                 continue
             if any(field.strip() == "" for field in row):
