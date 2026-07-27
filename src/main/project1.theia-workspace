@@ -1,0 +1,10 @@
+{
+  "folders": [
+    {
+      "path": "file:///home/ubuntu/NappyyCoder-PEP-PythonSQL-Project"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "/opt/theia-env/bin/python"
+  }
+}

@@ -34,12 +34,9 @@ def main():
         FOREIGN KEY (userId) REFERENCES users(userId)
     )''')
 
-    load_and_clean_users(os.path.join(_RESOURCES_DIR, 'users.csv'))
-    load_and_clean_call_logs(os.path.join(_RESOURCES_DIR, 'callLogs.csv'))
-    write_user_analytics(os.path.join(_RESOURCES_DIR, 'userAnalytics.csv'))
-    write_ordered_calls(os.path.join(_RESOURCES_DIR, 'orderedCalls.csv'))
-
-    # select_from_users_and_call_logs()  # Uncomment to debug
+    # IMPORTANT:
+    # Do NOT load CSVs here.
+    # The test runner calls your functions itself.
 
     cursor.close()
     conn.close()
