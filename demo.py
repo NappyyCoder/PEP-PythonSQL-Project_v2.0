@@ -1,8 +1,4 @@
-"""Run the call-center pipeline on the sample files in resources/.
-
-The graded test runner creates the SQLite tables and calls the functions in
-src/main/main.py itself. This script performs that setup for a local run.
-"""
+# Sets up the DB tables and runs the functions on the CSVs in resources/
 
 import os
 
