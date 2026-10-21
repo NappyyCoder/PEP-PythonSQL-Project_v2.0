@@ -15,7 +15,7 @@ From that database it writes two results back to CSV:
 
 There is no website or desktop window. You run it from the terminal. The graded entry points live in `src/main/main.py`. `demo.py` creates the database tables and runs the full pipeline on the sample files in `resources/`.
 
-The project architecture, including the data flow, table schema, and cleaning rules, is documented in the [project wiki](https://github.com/NappyyCoder/Python-SQL-API-with-File-IO/wiki/Architecture).
+The project architecture, including the data flow, table schema, and cleaning rules, is written up in [docs/wiki/Architecture.md](docs/wiki/Architecture.md) and published on the [project wiki](https://github.com/NappyyCoder/Python-SQL-API-with-File-IO/wiki/Architecture).
 
 ## Technologies Used
 
