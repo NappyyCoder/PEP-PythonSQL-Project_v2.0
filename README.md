@@ -1,78 +1,153 @@
-# Project: Python SQL API with File I/O
+# Python SQL API with File I/O
 
-## Background
+**GitHub repository:** [https://github.com/NappyyCoder/Python-SQL-API-with-File-IO](https://github.com/NappyyCoder/Python-SQL-API-with-File-IO)
 
-There are two halves in a full-stack application: the front end, responsible for user interaction and display, and the backend, which handles data storage and processing. In this project, we'll work on the backend, creating an application to manage data in a hypothetical call center. Our application will handle data for users and calls, and it will use that data to provide analytics and data ordering functionality.
+**Architecture wiki:** [https://github.com/NappyyCoder/Python-SQL-API-with-File-IO/wiki](https://github.com/NappyyCoder/Python-SQL-API-with-File-IO/wiki)
 
-The primary technologies you will leverage in this project are Python, SQL, and File I/O with .csv files. The project will be written in Python. Data will be loaded into an in-memory SQLite database from existing .csv files, and analytic data will be saved into new .csv files.
+## Project Description
 
-## Database Tables
+This is a Python backend for a hypothetical call center. It manages two kinds of records: the people who handle calls, and the calls themselves. The program reads those records from CSV files, skips rows that are incomplete or have the wrong number of fields, and stores the clean rows in an in-memory SQLite database.
 
-The following tables will be initialized in your project's built-in database upon startup.
+From that database it writes two results back to CSV:
 
-### users
+- `userAnalytics.csv` — average call duration and number of calls for each user
+- `orderedCalls.csv` — every stored call, sorted by user and then by start time
 
+There is no website or desktop window. You run it from the terminal. The graded entry points live in `src/main/main.py`. `demo.py` creates the database tables and runs the full pipeline on the sample files in `resources/`.
+
+The project architecture, including the data flow, table schema, and cleaning rules, is documented in the [project wiki](https://github.com/NappyyCoder/Python-SQL-API-with-File-IO/wiki/Architecture).
+
+## Technologies Used
+
+- Python - 3.13.1 (3.10 or newer is enough)
+- SQLite - 3.45.3, through Python's `sqlite3` module, stored in memory
+- Python `csv` - standard library, same release as the Python install
+- Python `unittest` - standard library, same release as the Python install
+
+No third-party packages are required. `pip install` is not part of setup. These commands are for a local machine. They are not tied to AWS, GCP, or any other cloud platform, and they work on macOS, Linux, and Windows.
+
+## Features
+
+- Load `resources/users.csv` into the `users` table
+- Load `resources/callLogs.csv` into the `callLogs` table
+- Skip any row that has an empty field or the wrong number of fields
+- Let SQLite assign `userId` and `callId`
+- Compute average call duration and call count per user
+- Write `resources/userAnalytics.csv`
+- Write `resources/orderedCalls.csv`, ordered by `userId` and then `startTime`
+- Unit tests for cleaning, analytics, and sort order
+
+### To-do list
+
+- Save the database to a file so the data is still there after the program exits
+- Add command-line arguments for choosing input and output paths
+- Check that phone numbers, timestamps, and call direction are valid values
+- Format average duration to a fixed number of decimal places when a report needs it
+
+## Getting Started
+
+Install Git and Python 3.10 or newer. Then clone the repository and run the demo. Nothing else needs to be installed.
+
+The diagram below is the shape of a successful run: two input files go into SQLite, and two result files come back out.
+
+![Architecture of the call center data pipeline](docs/images/architecture.png)
+
+### Unix (macOS and Linux)
+
+```bash
+git clone https://github.com/NappyyCoder/Python-SQL-API-with-File-IO.git
+cd Python-SQL-API-with-File-IO
+python3 --version
+python3 demo.py
+python3 -m unittest src.test.lab_test -v
 ```
-userId INTEGER PRIMARY KEY,
-firstName TEXT
-lastName TEXT
+
+### Windows (Command Prompt or PowerShell)
+
+```bat
+git clone https://github.com/NappyyCoder/Python-SQL-API-with-File-IO.git
+cd Python-SQL-API-with-File-IO
+py -3 --version
+py -3 demo.py
+py -3 -m unittest src.test.lab_test -v
 ```
 
-### callLogs
+On Windows, if `py` is not recognized, use `python` in place of `py -3`. On macOS or Linux, use `python3`, not `python`, when both Python 2 and Python 3 are installed.
 
+`demo.py` reads the CSV files that ship in `resources/`, creates the tables, and overwrites these two result files:
+
+- `resources/userAnalytics.csv`
+- `resources/orderedCalls.csv`
+
+The four tests in `src/test/lab_test.py` use the smaller CSV files in `src/test/`. They should finish with `OK`.
+
+`src/main/main.py` does not create tables or load files when you run it directly. The test runner does that setup itself and then calls `load_and_clean_users`, `load_and_clean_call_logs`, `write_user_analytics`, and `write_ordered_calls`. Use `demo.py` when you want to see the pipeline run.
+
+## Usage
+
+After the project is cloned, run the demo from the project folder.
+
+Unix:
+
+```bash
+python3 demo.py
 ```
-callId INTEGER PRIMARY KEY,
-phoneNumber TEXT,
-startTime INTEGER,
-endTime INTEGER,
-direction TEXT,
-userId INTEGER,
-FOREIGN KEY (userId) REFERENCES users(userId)
+
+Windows:
+
+```bat
+py -3 demo.py
 ```
 
-Note - by specifying IDs as primary keys, the id value should auto-increment for each new record.
+A run against the included sample data loads 5 users and 15 call logs. Rows in the source CSV files that are missing a value, or that have extra columns, are left out. The terminal prints the analytics and the ordered calls. It should look like this:
 
-# Technical Requirements
+![Terminal output from python3 demo.py](docs/images/sample-output.png)
 
-### SQLite
+`resources/userAnalytics.csv` from that run:
 
-- The app will already be a Python project with SQLite tables created at runtime.
-- You will be responsible for cleaning and inserting data into the database, as well as selecting and modifying that data for analysis.
+```csv
+userId,avgDuration,numCalls
+1,105.0,4
+2,40.0,5
+3,70.0,1
+4,55.0,2
+5,100.0,3
+```
 
-### CSV
+`avgDuration` is the average of `endTime - startTime` for that user's calls. `numCalls` is how many of that user's calls were stored. Duration is in the same units as the timestamps in the source file (seconds).
 
-- The callLogs.csv and users.csv files will be included in the resources folder for loading into the DB tables.
-- You will be responsible for loading the data from these existing files into the database, as well as writing analytic data to new files.
+`resources/orderedCalls.csv` has one row per stored call, with this header:
 
-# User Stories
+```csv
+callId,phoneNumber,startTime,endTime,direction,userId
+```
 
-### Load user data into users table
+Rows are sorted by `userId` ascending, and within each user by `startTime` ascending.
 
-- Load the users.csv file found in /resources into the users table
-- Clean the data before insertion. In this project, you just have to leave out any records with missing values or too many values.
-- HINT: For every record in users.csv, make sure it has the correct number of fields and no empty values before inserting into the Database.
+To run only the tests:
 
-### Load call data into callLogs table
+Unix:
 
-- Load the callLogs.csv file found in /resources into the callLogs table
-- Clean the data before insertion. In this project, you just have to leave out any records with missing values or too many values.
-- HINT: For every record in callLogs.csv, make sure it has the correct number of fields and no empty values before inserting into the Database.
+```bash
+python3 -m unittest src.test.lab_test -v
+```
 
-### Save user analytic data into userAnalytics.csv
+Windows:
 
-- Save analytic data for users into a csv file. The file must be named userAnalytics.csv, and it must be in the /resources folder
-- Records must include userId, avgDuration, numCalls. Example:
-  ```
-  userId,avgDuration,numCalls
-  1,105.0,4
-  ```
-- HINT: This data will be selected from the callLogs table.
-- HINT 2: Dictionaries will be very helpful for matching data with userIds. Consider one for {userId, average call duration} and one for {userId, number of calls}.
+```bat
+py -3 -m unittest src.test.lab_test -v
+```
 
-### Save ordered call logs into orderedCalls.csv
+The tests check four things: user rows are cleaned before insert, call rows are cleaned before insert, analytics match the test data, and ordered calls are sorted by user and start time.
 
-- Save call logs into csv files, ordered by userId, then start time. The file must be named orderedCalls.csv
-- HINT: This data will be selected from the callLogs table.
-- HINT 2: You can make use of ORDER BY to greatly simplify your python logic
+## Contributors
 
-* General note - each of these functions take a "file_path" parameter. You will not need to edit this variable, but it will be used to accomplish each implementation. See main() for an example of the function invocations with file paths from /resources.
+This is a solo project.
+
+- [NappyyCoder](https://github.com/NappyyCoder)
+
+## License
+
+This project uses the following license: MIT.
+
+See the [LICENSE](LICENSE) file for the full text.

@@ -33,19 +33,19 @@ def load_and_clean_users(file_path):
         next(reader, None)  # skip header
 
         for row in reader:
-            # Must have exactly 3 fields
-            if len(row) != 3:
+            # Must have exactly 2 fields (userId auto-increments)
+            if len(row) != 2:
                 continue
             # Must have no empty fields
             if any(field.strip() == "" for field in row):
                 continue
 
-            userId, firstName, lastName = row
+            firstName, lastName = row
 
             cursor.execute(
-                '''INSERT INTO users (userId, firstName, lastName)
-                   VALUES (?, ?, ?)''',
-                (int(userId), firstName, lastName)
+                '''INSERT INTO users (firstName, lastName)
+                   VALUES (?, ?)''',
+                (firstName, lastName)
             )
 
 
@@ -55,19 +55,19 @@ def load_and_clean_call_logs(file_path):
         next(reader, None)  # skip header
 
         for row in reader:
-            # Must have exactly 6 fields
-            if len(row) != 6:
+            # Must have exactly 5 fields (callId auto-increments)
+            if len(row) != 5:
                 continue
             # Must have no empty fields
             if any(field.strip() == "" for field in row):
                 continue
 
-            callId, phoneNumber, startTime, endTime, direction, userId = row
+            phoneNumber, startTime, endTime, direction, userId = row
 
             cursor.execute(
-                '''INSERT INTO callLogs (callId, phoneNumber, startTime, endTime, direction, userId)
-                   VALUES (?, ?, ?, ?, ?, ?)''',
-                (int(callId), phoneNumber, int(startTime), int(endTime), direction, int(userId))
+                '''INSERT INTO callLogs (phoneNumber, startTime, endTime, direction, userId)
+                   VALUES (?, ?, ?, ?, ?)''',
+                (phoneNumber, int(startTime), int(endTime), direction, int(userId))
             )
 
 
